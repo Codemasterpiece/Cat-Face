@@ -160,7 +160,7 @@ font-family: 'Montserrat', sans-serif;
 
 #result-container {
   font-size: 1.2rem;
-  font-weight: bold;
+  font-weight: 100;
   color: #555555; /* 회색 글씨 */
   background-color: #ffffff; /* 하얀 배경 */
   padding: 10px;
@@ -169,3 +169,8 @@ font-family: 'Montserrat', sans-serif;
   margin: 20px auto;
   max-width: 600px;
 }
+
+.addthis_inline_share_toolbox_219y {
+  text-align: center;
+}
+
