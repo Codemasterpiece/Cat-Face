@@ -6,11 +6,6 @@ UPDATED : 230219 -->
 <html>
 	<head>
 		<link rel="stylesheet" href="style.css" />
-		<!-- Go to www.addthis.com/dashboard to customize your tools -->
-		<script
-			type="text/javascript"
-			src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-63fa2389fa15ed34"
-		></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	</head>
 	<body>
@@ -49,11 +44,21 @@ UPDATED : 230219 -->
 					<div class="image-title-wrap"></div>
 				</div>
 			</div>
-			<div class="result-box"></div>
+			<div class="chart-container">
+			  <div class="chart-bar">
+				<div class="bar-label">1순위 예측</div>
+				<div class="bar-percent" id="prob1"></div>
+			  </div>
+			  <div class="chart-bar">
+				<div class="bar-label">2순위 예측</div>
+				<div class="bar-percent" id="prob2"></div>
+			  </div>
+			  <div class="chart-bar">
+				<div class="bar-label">3순위 예측</div>
+				<div class="bar-percent" id="prob3"></div>
+			  </div>
+			</div>
 			<div id="result-container" class=""></div>
-			<div id="result-container"></div>
-			<!-- Go to www.addthis.com/dashboard to customize your tools -->
-			<div class="addthis_inline_share_toolbox_219y"></div>
 			<div id="webcam-container"></div>
 			<div id="label-container"></div>
 			<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
@@ -116,295 +121,53 @@ UPDATED : 230219 -->
 						labelContainer.appendChild(document.createElement('div'));
 					}
 				}
-				// run the webcam image through the image model
 				async function predict() {
 					var image = document.getElementById('catimage');
-					// predict can take in an image, video or canvas html element
 					const prediction = await model.predict(image, false);
 					let maxIndex = 0;
 					let maxProb = 0;
+					let secondMaxIndex = 0;
+					let secondMaxProb = 0;
+					let thirdMaxIndex = 0;
+					let thirdMaxProb = 0;
 
 					for (let i = 0; i < maxPredictions; i++) {
 						if (prediction[i].probability > maxProb) {
+							thirdMaxIndex = secondMaxIndex;
+							thirdMaxProb = secondMaxProb;
+							secondMaxIndex = maxIndex;
+							secondMaxProb = maxProb;
 							maxIndex = i;
 							maxProb = prediction[i].probability;
+						} else if (prediction[i].probability > secondMaxProb) {
+							thirdMaxIndex = secondMaxIndex;
+							thirdMaxProb = secondMaxProb;
+							secondMaxIndex = i;
+							secondMaxProb = prediction[i].probability;
+						} else if (prediction[i].probability > thirdMaxProb) {
+							thirdMaxIndex = i;
+							thirdMaxProb = prediction[i].probability;
 						}
 					}
+
 					const probabilityPercent = Math.round(maxProb * 100);
-					if (maxIndex === 0) {
-						document.getElementById('result-container').innerHTML =
-							'코리안 쇼트헤어일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br> 코리안 쇼트헤어는 대한민국에서 태어난 쇼트헤어 종의 고양이로, 활발하고 지적인 성격을 가지고 있습니다.';
-					} else if (maxIndex === 1) {
-						document.getElementById('result-container').innerHTML =
-							'노르웨이 숲 고양이(Norwegian Forest Cat)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>털이 두껍고 긴 털을 가지고 있으며, 겨울에는 털이 더욱 굵어집니다. 개성있고 독립적인 성격을 가지고 있으며, 주인에게 충실하고 애정을 보입니다.';
-					} else if (maxIndex === 2) {
-						document.getElementById('result-container').innerHTML =
-							'데본렉스 (Devon Rex)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>눈이 크고 삼각형 모양의 귀가 특징인 고양이로, 털이 부드럽고 볼륨감이 있습니다. 활발하고 사람을 좋아하는 성격을 가지고 있으며, 매우 호기심이 많습니다.';
-					} else if (maxIndex === 3) {
-						document.getElementById('result-container').innerHTML =
-							'라가머핀 (Ragamuffin)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>차분하고 온순한 성격을 가지고 있으며, 주인에게 애정을 보이는 면이 있습니다. 크고 둥근 눈과 대규모의 몸집이 특징인 고양이로, 털이 부드럽고 두껍습니다.';
-					} else if (maxIndex === 4) {
-						document.getElementById('result-container').innerHTML =
-							'라팜 (LaPerm)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>곱슬한 털이 특징인 고양이로, 길이와 밀도가 제각각입니다. 친근하고 애정 어린 성격을 가지고 있으며, 새로운 환경에 대한 적응력이 뛰어납니다.';
-					} else if (maxIndex === 5) {
-						document.getElementById('result-container').innerHTML =
-							'랙돌 (Ragdoll)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>대형 고양이 종류 중 하나로, 부드러운 털이 특징인 고양이입니다. 차분하고 침착한 성격을 가지고 있으며, 주인에게 애정을 보이는 면이 있습니다.';
-					} else if (maxIndex === 6) {
-						document.getElementById('result-container').innerHTML =
-							'러시안 블루 (Russian Blue)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>푸른색의 털이 특징인 고양이로, 털이 부드럽고 짧습니다. 조용하고 우아한 성격을 가지고 있으며, 신중하게 행동하는 경향이 있습니다.';
-					} else if (maxIndex === 7) {
-						document.getElementById('result-container').innerHTML =
-							'맹크스 (Manx)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>꼬리가 없거나 짧은 꼬리가 특징인 고양이로, 귀가 큽니다. 활발하고 호기심 많은 성격을 가지고 있으며, 사람에게 끊임없이 관심을 기울입니다.';
-					} else if (maxIndex === 8) {
-						document.getElementById('result-container').innerHTML =
-							'먼치킨 (Munchkin)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>다른 고양이와는 달리 짧은 다리와 긴 몸통을 가지고 있습니다. 적극적이고 사람 친화적인 성격을 가지고 있으며, 새로운 환경에 대한 적응력이 뛰어납니다.';
-					} else if (maxIndex === 9) {
-						document.getElementById('result-container').innerHTML =
-							'메인쿤 (Maine Coon)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>대형 고양이 종류 중 하나로, 털이 두껍고 길며, 몸집이 큽니다. 온순하고 차분한 성격을 가지고 있으며, 높은 지능과 기민함을 지니고 있습니다.';
-					} else if (maxIndex === 10) {
-						document.getElementById('result-container').innerHTML =
-							'발리네즈 (Balinese)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>길고 가늘고 민첩한 몸과 매끄러운 털이 특징인 고양이로, 초록색 눈이 특징입니다. 사람 친화적인 성격을 가지고 있으며, 활발하고 지적인 면이 있습니다.';
-					} else if (maxIndex === 11) {
-						document.getElementById('result-container').innerHTML =
-							'버만 (Birman)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>머리에 대한 부분이 짙고 몸은 더 연한 색상의 털이 특징인 고양이입니다. 온순하고 침착한 성격을 가지고 있으며, 조용하고 무드가 안정적입니다.';
-					} else if (maxIndex === 12) {
-						document.getElementById('result-container').innerHTML =
-							'버미즈 (Burmese)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>긴 몸통과 큰 눈, 매끄러운 털이 특징인 고양이로, 길이가 짧은 인접한 색의 스타이들이 특징입니다. 활발하고 사람을 좋아하는 성격을 가지고 있으며, 지능이 높고 호기심이 많습니다.';
-					} else if (maxIndex === 13) {
-						document.getElementById('result-container').innerHTML =
-							'봄베이 고양이(Bombay)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>검은색 털이 특징인 고양이로, 귀가 크고 살짝 둥글어져 있습니다. 활발하고 사람을 좋아하는 성격을 가지고 있으며, 지적이고 똑똑한 면이 있습니다.';
-					} else if (maxIndex === 14) {
-						document.getElementById('result-container').innerHTML =
-							'브리티쉬 쇼트헤어 (British Shorthair)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>털이 짧고 굵은 털이 특징인 고양이로, 다양한 색상의 털을 가지고 있습니다. 차분하고 침착한 성격을 가지고 있으며, 매우 귀여운 모습으로 인기가 높습니다.';
-					} else if (maxIndex === 15) {
-						document.getElementById('result-container').innerHTML =
-							'시베리아 고양이 (Siberian)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>풍성한 털이 특징인 고양이로, 겨울에는 더욱 굵은 털을 가지고 있습니다. 차분하고 친근한 성격을 가지고 있으며, 인간을 좋아하며 사람들과 어울리는 것을 좋아합니다.';
-					} else if (maxIndex === 16) {
-						document.getElementById('result-container').innerHTML =
-							'샴고양이 (Siamese)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>긴 몸통과 독특한 털색이 특징인 고양이로, 세련된 외모를 가지고 있습니다. 매우 활발하고 사람을 좋아하는 성격을 가지고 있으며, 주인에게 애정을 보이는 면이 있습니다.';
-					} else if (maxIndex === 17) {
-						document.getElementById('result-container').innerHTML =
-							'샤트룩스 (Chartreux)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>블루 그레이 컬러의 귀여운 외모가 특징인 고양이로, 귀가 중간 정도 크기입니다. 조용하고 차분한 성격을 가지고 있으며, 매우 스마트하고 똑똑한 면이 있습니다.';
-					} else if (maxIndex === 18) {
-						document.getElementById('result-container').innerHTML =
-							'셀커크 렉스 (Selkirk Rex)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>곱슬한 털이 특징인 고양이로, 크고 둥근 눈을 가지고 있습니다. 차분하고 친근한 성격을 가지고 있으며, 주인에게 애정을 보이는 면이 있습니다.';
-					} else if (maxIndex === 19) {
-						document.getElementById('result-container').innerHTML =
-							'소말리 고양이(Somali)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>무늬와 꼬리가 긴 털이 특징인 고양이로, 활발하고 우아한 모습을 가지고 있습니다. 매우 지적이고 호기심이 많은 성격을 가지고 있으며, 주인에게 충성심을 보입니다.';
-					} else if (maxIndex === 20) {
-						document.getElementById('result-container').innerHTML =
-							'스코티시 폴드 (Scottish Fold)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>귀가 접혀서 귀모양이 둥글게 보입니다. 온순하고 친근한 성격을 가지고 있으며, 적극적인 성격으로 유명합니다.';
-					} else if (maxIndex === 21) {
-						document.getElementById('result-container').innerHTML =
-							'스핑크스 (Sphynx)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>대부분의 고양이와는 달리 털이 거의 없는 외모를 가지고 있습니다. 활발하고 지적인 성격을 가지고 있으며, 사람에게 끊임없이 관심을 기울입니다.';
-					} else if (maxIndex === 22) {
-						document.getElementById('result-container').innerHTML =
-							'싱가퓨라 (Singapura)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>작고 가벼운 몸과 빛나는 색상의 털이 특징인 고양이로, 뛰어난 사냥꾼입니다. 활발하고 사람을 좋아하는 성격을 가지고 있으며, 인간과 놀아주는 것을 즐기며 기민하고 지적인 면이 있습니다.';
-					} else if (maxIndex === 23) {
-						document.getElementById('result-container').innerHTML =
-							'아메리칸 밥테일 (American Bobtail)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>짧은 꼬리와 크고 둥근 눈이 특징인 고양이로, 크고 우아한 외모를 가지고 있습니다. 사람을 좋아하고 애정 어린 성격을 가지고 있으며, 활발하고 호기심 많은 면이 있습니다.';
-					} else if (maxIndex === 24) {
-						document.getElementById('result-container').innerHTML =
-							'아메리칸 쇼트헤어 (American Shorthair)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>두꺼운 짧은 털과 다양한 색상의 털이 특징인 고양이로, 뚱뚱한 외모를 가지고 있습니다. 차분하고 온순한 성격을 가지고 있으며, 매우 귀여운 모습으로 인기가 높습니다.';
-					} else if (maxIndex === 25) {
-						document.getElementById('result-container').innerHTML =
-							'아메리칸 와이어헤어 (American Wirehair)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>뒤집힌 털과 둥근 귀가 특징인 고양이로, 다양한 색상의 털을 가지고 있습니다. 차분하고 침착한 성격을 가지고 있으며, 애정 어린 면이 있습니다.';
-					} else if (maxIndex === 26) {
-						document.getElementById('result-container').innerHTML =
-							'아메리칸 컬 (American Curl)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>둥근 귀가 특징인 고양이로, 다양한 색상의 털을 가지고 있습니다. 차분하고 친근한 성격을 가지고 있으며, 사람에게 끊임없이 관심을 기울입니다.';
-					} else if (maxIndex === 27) {
-						document.getElementById('result-container').innerHTML =
-							'아비시니안 고양이 (Abyssinian)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>짧은 털과 활발한 모습이 특징인 고양이로, 강한 사냥 본능을 지니고 있습니다. 지적이고 호기심이 많은 성격을 가지고 있으며, 활동적인 면이 있습니다.';
-					} else if (maxIndex === 28) {
-						document.getElementById('result-container').innerHTML =
-							'오리엔탈 고양이 (Oriental)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>날씬한 몸과 대규모의 귀가 특징인 고양이로, 다양한 색상의 털을 가지고 있습니다. 활발하고 호기심 많은 성격을 가지고 있으며, 지적인 면이 있습니다.';
-					} else if (maxIndex === 29) {
-						document.getElementById('result-container').innerHTML =
-							'오시캣 (Ocicat)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>빛나는 얼룩무늬와 푸른 눈이 특징인 고양이로, 크기와 형태는 레오파드와 유사합니다. 활발하고 호기심 많은 성격을 가지고 있으며, 지적인 면이 있습니다.';
-					} else if (maxIndex === 30) {
-						document.getElementById('result-container').innerHTML =
-							'유러피안 버미즈 (European Burmese)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>짧은 털과 뚱뚱한 몸뚱이가 특징인 고양이로, 무늬와 색상이 다양합니다. 사람에 대한 애정이 깊고 친근한 성격을 가지고 있으며, 활발한 면이 있습니다.';
-					} else if (maxIndex === 31) {
-						document.getElementById('result-container').innerHTML =
-							'이그저틱 (Exotic)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>온순하고 친근한 성격을 가지고 있으며, 적극적이지는 않지만 매우 사랑스러운 모습으로 사랑을 받습니다.짧은 털과 귀여운 외모가 특징인 고양이로, 페르시안 고양이와 유사합니다.';
-					} else if (maxIndex === 32) {
-						document.getElementById('result-container').innerHTML =
-							'이집션 마우 (Egyptian Mau)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>야망적인 눈과 빛나는 색의 털이 특징인 고양이로, 사냥꾼으로서의 본능이 강합니다. 활발하고 호기심 많은 성격을 가지고 있으며, 사람에 대한 애정이 깊습니다.';
-					} else if (maxIndex === 33) {
-						document.getElementById('result-container').innerHTML =
-							'자바니즈 (Javanese)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>긴 털과 화려한 색상이 특징인 고양이로, 시암 고양이와 유사합니다. 활발하고 친근한 성격을 가지고 있으며, 매우 지적인 면이 있습니다.';
-					} else if (maxIndex === 34) {
-						document.getElementById('result-container').innerHTML =
-							'재패니즈 밥테일 (Japanese Bobtail)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>짧은 꼬리와 뛰어난 사냥꾼으로서의 본능을 지니고 있는 고양이입니다. 적극적이고 사람 친화적인 성격을 가지고 있으며, 새로운 환경에 대한 적응력이 뛰어납니다.';
-					} else if (maxIndex === 35) {
-						document.getElementById('result-container').innerHTML =
-							'컬러포인트 쇼트헤어 (Colorpoint Shorthair)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>시암 고양이와 비슷한 외모를 가진 고양이로, 뛰어난 사냥꾼으로서의 본능을 지니고 있습니다. 활발하고 장난스러운 성격을 가지고 있으며, 사람에게 애정을 보이는 면이 있습니다.';
-					} else if (maxIndex === 36) {
-						document.getElementById('result-container').innerHTML =
-							'코랫 (Korat)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>푸른색의 털과 대형의 눈이 특징인 고양이로, 활발하고 지적인 성격을 가지고 있습니다. 주인에게 충성심이 높으며, 상황에 따라 다양한 행동을 보이기 때문에 주인의 이목을 끕니다.';
-					} else if (maxIndex === 37) {
-						document.getElementById('result-container').innerHTML =
-							'터키시 반 (Turkish Van)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>흰색 털에 적은 양의 다양한 색상의 얼룩무늬가 특징인 고양이로, 물애호의적 성격을 가지고 있습니다. 사람에게 끊임없이 관심을 기울이며, 수영을 좋아한다는 특징이 있습니다.';
-					} else if (maxIndex === 38) {
-						document.getElementById('result-container').innerHTML =
-							'터키시 앙고라 (Turkish Angora)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>긴 털과 다양한 색상의 털이 특징인 고양이로, 매우 활발하고 장난스러운 성격을 가지고 있습니다. 다른 고양이와도 잘 지낼 수 있으며, 사람에게 애정을 보이는 면이 있습니다.';
-					} else if (maxIndex === 39) {
-						document.getElementById('result-container').innerHTML =
-							'통키니즈 (Tonkinese)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>시암 고양이와 버만 고양이의 교배로 탄생한 고양이로, 푸른 눈과 부드러운 털이 특징인 고양이입니다. 매우 활발하고 사람에게 애정 어린 성격을 가지고 있으며, 인내심이 강하다는 특징이 있습니다.';
-					} else if (maxIndex === 40) {
-						document.getElementById('result-container').innerHTML =
-							'페르시안 고양이 (Persian)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>긴 털과 다양한 색상의 털이 특징인 고양이로, 부드러운 털과 우아한 외모를 가지고 있습니다. 온순하고 차분한 성격을 가지고 있으며, 일반적으로 조용한 성격을 가지고 있습니다.';
-					} else if (maxIndex === 41) {
-						document.getElementById('result-container').innerHTML =
-							'하바나 브라운 (Havana Brown)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>갈색의 털과 녹색의 눈이 특징인 고양이로, 뛰어난 사냥꾼으로서의 본능을 지니고 있습니다. 사람에게 애정 어린 성격을 가지고 있으며, 활발하고 적극적인 면이 있습니다. 인내심이 강하다는 특징이 있습니다.';
-					} else if (maxIndex === 42) {
-						document.getElementById('result-container').innerHTML =
-							'피터볼드 (Peterbald)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>민첩한 움직임과 매끄러운 피부가 특징인 고양이로, 주인에게 애정을 보이는 성격을 가지고 있습니다. 높은 지능과 호기심이 강한 편이며, 다른 동물과도 잘 지납니다.';
-					} else if (maxIndex === 43) {
-						document.getElementById('result-container').innerHTML =
-							'네벨룽 (Nebelung)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>긴 털과 귀가 길며, 푸른 색의 털이 특징인 고양이로, 조용하고 차분한 성격을 가지고 있습니다. 다른 고양이나 동물과도 잘 지내며, 사람에게 충성심이 높은 편입니다.';
-					} else if (maxIndex === 44) {
-						document.getElementById('result-container').innerHTML =
-							'토이거 (Toyger)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>호랑이와 비슷한 모양의 털과 뛰어난 사냥꾼으로서의 본능을 지니고 있는 고양이로, 능동적이고 호기심이 강한 성격을 가지고 있습니다. 다른 고양이와도 잘 지내며, 사람에게 애정 어린 성격을 가지고 있습니다.';
-					} else if (maxIndex === 45) {
-						document.getElementById('result-container').innerHTML =
-							'픽시 밥 (Pixie-bob)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>짧은 꼬리와 큰 몸집이 특징인 고양이로, 강한 사냥 본능을 가지고 있습니다. 온순하고 친근한 성격을 가지고 있으며, 사람과 쉽게 친해집니다.';
-					} else if (maxIndex === 46) {
-						document.getElementById('result-container').innerHTML =
-							'스노우슈 (Snowshoe)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>흰색의 발바닥과 다양한 색상의 털이 특징인 고양이로, 사람에게 애정 어린 성격을 가지고 있습니다. 다른 고양이나 동물과도 잘 지내며, 사람과 깊은 유대를 형성합니다.';
-					} else if (maxIndex === 47) {
-						document.getElementById('result-container').innerHTML =
-							'사바나 (Savannah)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>퓨어브리드 고양이 중 하나로, 표범과 같은 외모와 활발한 성격을 가지고 있습니다. 다른 동물과 잘 지내지만, 고양이에 대한 경험이 없는 사람들은 함부로 키우기 어렵다는 점을 참고해야 합니다.';
-					} else if (maxIndex === 48) {
-						document.getElementById('result-container').innerHTML =
-							'사트트뢰 (Siberian)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>풍성한 털과 대형 몸뚱이가 특징인 고양이로, 차분하고 상냥한 성격을 가지고 있습니다. 인내심이 강하며, 다른 동물과도 잘 지내는 편입니다.';
-					} else if (maxIndex === 49) {
-						document.getElementById('result-container').innerHTML =
-							'오리엔탈 쇼트헤어 (Oriental Shorthair)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>다양한 색상의 털과 긴 다리가 특징인 고양이로, 매우 활발하고 지적인 성격을 가지고 있습니다. 사람에게 애정 어린 성격을 가지고 있으며, 높은 지능과 호기심이 강합니다.';
-					} else if (maxIndex === 50) {
-						document.getElementById('result-container').innerHTML =
-							'히말리안 고양이 (Himalayan)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>페르시안 고양이와 시암 고양이를 교배하여 탄생한 고양이로, 부드러운 털과 사람을 좋아하는 성격이 특징인 고양이입니다. 다른 고양이나 동물과도 잘 지내며, 인내심이 강하고 사람에 대한 애정이 깊습니다.';
-					} else if (maxIndex === 51) {
-						document.getElementBId('result-container').innerHTML =
-							'엑조틱 숏헤어 (Exotic Shorthair)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>페르시안 고양이와 쇼트헤어 고양이를 교배하여 탄생한 고양이로, 부드러운 털과 귀여운 얼굴이 특징인 고양이입니다. 인내심이 강하며, 다른 고양이나 동물과도 잘 지내는 편입니다.';
-					} else if (maxIndex === 52) {
-						document.getElementById('result-container').innerHTML =
-							'벵골고양이 (Bengal)일 확률 ' +
-							probabilityPercent +
-							'% 입니다. <br>퓨어브리드 고양이 중 하나로, 표범과 같은 외모와 활발한 성격을 가지고 있습니다. 다른 동물과 잘 지내지만, 고양이에 대한 경험이 없는 사람들은 함부로 키우기 어렵다는 점을 참고해야 합니다.';
-					}
+					const secondProbabilityPercent = Math.round(secondMaxProb * 100);
+					const thirdProbabilityPercent = Math.round(thirdMaxProb * 100);
+					const classNames = ['코리안 쇼트헤어','노르웨이 숲 고양이 (Norwegian Forest Cat)','데본렉스 (Devon Rex)','라가머핀 (Ragamuffin)','라팜 (LaPerm)','랙돌 (Ragdoll)','러시안 블루 (Russian Blue)','맹크스 (Manx)','먼치킨 (Munchkin)','메인쿤 (Maine Coon)','발리네즈 (Balinese)','버만 (Birman)','버미즈 (Burmese)','봄베이 고양이(Bombay)','브리티쉬 쇼트헤어 (British Shorthair)','시베리아 고양이 (Siberian)','샴고양이 (Siamese)','샤트룩스 (Chartreux)','셀커크 렉스 (Selkirk Rex)','소말리 고양이(Somali)','스코티시 폴드 (Scottish Fold)','스핑크스 (Sphynx)','싱가퓨라 (Singapura)','아메리칸 밥테일 (American Bobtail','아메리칸 쇼트헤어 (American Shorthair)','아메리칸 와이어헤어 (American Wirehair)','아메리칸 컬 (American Curl)','아비시니안 고양이 (Abyssinian)','오리엔탈 고양이 (Oriental)','오시캣 (Ocicat)','유러피안 버미즈 (European Burmese)','이그저틱 (Exotic)','이집션 마우 (Egyptian Mau)','자바니즈 (Javanese)','재패니즈 밥테일 (Japanese Bobtail)','컬러포인트 쇼트헤어 (Colorpoint Shorthair)','코랫 (Korat)','터키시 반 (Turkish Van)','터키시 앙고라 (Turkish Angora)','통키니즈 (Tonkinese)','페르시안 고양이 (Persian)','하바나 브라운 (Havana Brown)','터볼드 (Peterbald)','네벨룽 (Nebelung)','토이거 (Toyger)','픽시 밥 (Pixie-bob)','스노우슈 (Snowshoe)','사바나 (Savannah)','사트트뢰 (Siberian)','오리엔탈 쇼트헤어 (Oriental Shorthair)','히말리안 고양이 (Himalayan)','엑조틱 숏헤어 (Exotic Shorthair)','벵골고양이 (Bengal)'];
+					const maxClassName = classNames[maxIndex];
+					const query = maxClassName.split(' ').join('_');
+					const wikiSearchUrl = `https://ko.wikipedia.org/w/index.php?search=${query}&title=특수:검색&go=문서&ns0=1`;
+				    const resultHTML =
+    				`<a href="${wikiSearchUrl}" target="_blank">위키피디아에서 1순위 예측 고양이 더 알아보기</a>`;
+					
+					document.getElementById('result-container').innerHTML = resultHTML;
+					
+					document.getElementById("prob1").innerHTML = `${maxClassName}<br> ${probabilityPercent}%`;
+					document.getElementById("prob2").innerHTML = `${classNames[secondMaxIndex]}<br> ${secondProbabilityPercent}%`;
+					document.getElementById("prob3").innerHTML = `${classNames[thirdMaxIndex]}<br> ${thirdProbabilityPercent}%`;
+
 				}
 			</script>
 		</body>
-
-		<!-- Copyright (c) 2023 by Aaron Vanston (https://codepen.io/aaronvanston/pen/yNYOXR)
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- -->
 	</body>
 </html>
