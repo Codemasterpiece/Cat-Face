@@ -33,7 +33,7 @@ UPDATED : 230219 -->
 					onchange="readURL(this);"
 					accept="image/*"/>
 				<div class="drag-text">
-					<h3>사진을 업로드 해주시고 위의 '감별 시작'을 더블 클릭 해주세요.</h3>
+					<h3>사진을 업로드 해주시고 위의 '감별 시작'을 눌러주세요.</h3>
 				</div>
 			</div>
 			<div class="file-upload-content">
@@ -42,9 +42,6 @@ UPDATED : 230219 -->
 			</div>
 			<div class="modal">
 			  <div class="modal-content">
-				<div class="result-box">
-				  <!-- contents of result box here -->
-				</div>
 				<div class="modal-body">
 				  <div class="modal-image">
 					<img id="modalimage" src="#" alt="your image" />
@@ -52,9 +49,10 @@ UPDATED : 230219 -->
 				  <div class="chart-container">
 					<h3>상위 식별 고양이</h3>
 					<canvas id="prediction-chart-modal"></canvas>
-				  </div>
+				  </div>	
 				</div>
 				<div class="modal-header">
+				<div class="result-box"></div>	
 				  <button class="modal-close" onclick="modal.close()">X</button>
 				</div>
 			  </div>
@@ -90,26 +88,28 @@ UPDATED : 230219 -->
 				$('.image-upload-wrap').removeClass('image-dropping');
 			});
 			const modal = {
-				// 모달을 열기 위한 메서드
-				open: function () {
-					// 모달을 보여줄 요소 선택
-					const modal = document.querySelector('.modal');
-					// 모달 열기
-					modal.style.display = 'block';
-				},
-				// 모달을 닫기 위한 메서드
-				close: function () {
-					// 모달을 닫을 요소 선택
-					const modal = document.querySelector('.modal');
-					// 모달 닫기
-					modal.style.display = 'none';
-					// 차트 초기화
-					Chart.helpers.each(Chart.instances, function (instance) {
-						if (instance.chart.canvas.id === 'prediction-chart-modal') {
-							instance.chart.destroy();
-						}
-					});
-				},
+			  // 모달을 열기 위한 메서드
+			  open: function () {
+				// 모달을 보여줄 요소 선택
+				const modal = document.querySelector('.modal');
+				// 모달 열기
+				modal.style.display = 'block';
+			  },
+			  // 모달을 닫기 위한 메서드
+			  close: function () {
+				// 모달을 닫을 요소 선택
+				const modal = document.querySelector('.modal');
+				// 모달 닫기
+				modal.style.display = 'none';
+				// 차트 초기화
+				Chart.helpers.each(Chart.instances, function (instance) {
+				  if (instance.chart && instance.chart.canvas && instance.chart.canvas.id === 'prediction-chart-modal') {
+					instance.chart.destroy();
+				  }
+				});
+				// 페이지 새로고침
+				location.reload();
+			  },
 			};
 		</script>
 		<script type="text/javascript">
