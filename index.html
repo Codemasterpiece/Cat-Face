@@ -7,12 +7,12 @@ UPDATED : 230219 -->
 		<link rel="stylesheet" href="style.css" />
 		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	</head>
-	<body>
+	<body onload="init();">
 		<div class="title">
 		  <img src="https://i.postimg.cc/Mfjj4qH0/cat.jpg" alt="고양이 이미지">
 		  고양이 감별사
 		</div>
-		<div class="subtitle">내 고양이는 어떤 고양이일까?</div>
+		<div class="subtitle">내 고양이는<br> 어떤 <br>고양이일까?</div>
 		<button class="start-button" type="button" onclick="init(); predict();"><img src="https://i.postimg.cc/phMTTzLj/image.png" alt="이미지">
 		감별 시작</button>
 		<script
@@ -33,7 +33,7 @@ UPDATED : 230219 -->
 					onchange="readURL(this);"
 					accept="image/*"/>
 				<div class="drag-text">
-					<h3>사진을 업로드 해주시고 위의 '감별 시작'을 눌러주세요.</h3>
+					<h3>사진을 업로드 해주시고<br> 위의 '감별 시작'을 <br>눌러주세요.</h3>
 				</div>
 			</div>
 			<div class="file-upload-content">
